@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ข่าวสารล่าสุด — BrandName</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --bg: #0f172a;
+            --card: #0b1220;
+            --accent1: #7c3aed;
+            --accent2: #06b6d4;
+            --muted: #9aa4b2;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, #071028 0%, #071623 50%, #041022 100%);
+            color: #e6eef8;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: rgba(12, 18, 30, 0.75);
+            backdrop-filter: blur(8px);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        header .logo {
+            font-weight: 800;
+            font-size: 20px;
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav a {
+            margin-left: 18px;
+            text-decoration: none;
+            color: var(--muted);
+            font-weight: 600;
+        }
+        
+        nav a:hover {
+            color: #fff;
+        }
+        
+        main {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+        .news-card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .news-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .news-card-content {
+            padding: 16px;
+        }
+        
+        .news-card h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+        }
+        
+        .news-card p {
+            color: var(--muted);
+            font-size: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            color: var(--muted);
+            padding: 20px;
+            font-size: 14px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">BrandName</div>
+        <nav>
+            <a href="index.html">หน้าแรก</a>
+            <a href="news.html">ข่าวสาร</a>
+            <a href="#contact">ติดต่อ</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>ข่าวสารล่าสุด</h1>
+        <div class="subtitle">อัปเดตทุกความเคลื่อนไหวจาก BrandName และวงการเทคโนโลยี</div>
+
+        <div class="news-grid">
+            <div class="news-card" onclick="openNews('news1')">
+                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800" alt="ข่าว 1">
+                <div class="news-card-content">
+                    <h3>เปิดตัวผลิตภัณฑ์ใหม่ SmartPro 2025</h3>
+                    <p>SmartPro 2025 มาพร้อมดีไซน์ทันสมัยและเทคโนโลยีสุดล้ำ ตอบโจทย์การใช้งานยุคดิจิทัล</p>
+                </div>
+            </div>
+
+            <div class="news-card" onclick="openNews('news2')">
+                <img src="https://images.unsplash.com/photo-1542744173-05336fcc7ad4?w=800" alt="ข่าว 2">
+                <div class="news-card-content">
+                    <h3>โปรโมชั่นพิเศษลดสูงสุด 50%</h3>
+                    <p>เฉพาะเดือนนี้เท่านั้น รับส่วนลดพิเศษจากสินค้าทั้งหมดในหมวดเทคโนโลยี</p>
+                </div>
+            </div>
+
+            <div class="news-card" onclick="openNews('news3')">
+                <img src="https://images.unsplash.com/photo-1522204501512-6c0b66ebfa3b?w=800" alt="ข่าว 3">
+                <div class="news-card-content">
+                    <h3>ร่วมงาน Tech Expo 2025</h3>
+                    <p>BrandName ได้เข้าร่วมงานแสดงเทคโนโลยีระดับโลก พร้อมนำเสนอผลิตภัณฑ์ใหม่ล่าสุด</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        © 2025 BrandName — ข่าวสารและบทความทั้งหมดสงวนลิขสิทธิ์
+    </footer>
+
+    <script>
+        function openNews(id) {
+            alert('เปิดข่าว: ' + id + '\n(คุณสามารถเชื่อมลิงก์ไปยังหน้ารายละเอียดข่าวจริงได้)');
+        }
+    </script>
+</body>
+
+</html>
