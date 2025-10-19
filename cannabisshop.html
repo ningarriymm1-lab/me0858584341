@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Shopee-like Shop + Wallet + Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0
+        }
+        
+        header {
+            background: linear-gradient(90deg, #00eeff, #00eeff);
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: auto
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            margin: 0;
+            padding: 0
+        }
+        
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold
+        }
+        
+        nav ul li a i {
+            margin-right: 6px
+        }
+        
+        nav ul li a:hover,
+        nav ul li a.active {
+            border-bottom: 2px solid #fff;
+            padding-bottom: 2px
+        }
+        
+        .hamburger {
+            display: none;
+            font-size: 28px;
+            cursor: pointer
+        }
+        
+        @media(max-width:768px) {
+            nav ul {
+                display: none;
+                flex-direction: column;
+                background: linear-gradient(180deg, #00eeff, #00eeff);
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                padding: 15px;
+                border-radius: 10px
+            }
+            nav ul.show {
+                display: flex
+            }
+            .hamburger {
+                display: block
+            }
+        }
+        
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto
+        }
+        
+        .hidden {
+            display: none
+        }
+        
+        .msg {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px
+        }
+        
+        .wallet,
+        .add-money {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, .1)
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px
+        }
+        
+        .product {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0, 0, 0, .1);
+            display: flex;
+            flex-direction: column
+        }
+        
+        .product img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover
+        }
+        
+        .product-info {
+            padding: 10px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between
+        }
+        
+        .product-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px
+        }
+        
+        .product-info p {
+            margin: 0 0 10px 0;
+            color: #00eeff;
+            font-weight: bold
+        }
+        
+        .product-info button {
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            background: #00eeff;
+            color: #fff;
+            cursor: pointer
+        }
+        
+        .product-info button:hover {
+            background: #3d76e0
+        }
+        
+        .history {
+            background: #fff;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow: auto;
+            box-shadow: 0 0 5px rgba(0, 0, 0, .1)
+        }
+        
+        .history-item {
+            margin-bottom: 5px
+        }
+        
+        .time {
+            color: #555;
+            font-size: 12px
+        }
+        
+        .card {
+            background: #fff;
+            padding: 20px;
+            max-width: 400px;
+            margin: 50px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .1)
+        }
+        
+        .card input,
+        .card button {
+            width: 90%%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc
+        }
+        
+        .card button {
+            background: #00eeff;
+            color: #fff;
+            border: none;
+            cursor: pointer
+        }
+        
+        .card button:hover {
+            background: #00eeff
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login/Register -->
+    <div id="loginPage" class="card">
+        <h2>เข้าสู่ระบบ</h2>
+        <input type="text" id="loginUser" placeholder="ชื่อผู้ใช้">
+        <input type="password" id="loginPass" placeholder="รหัสผ่าน">
+        <button onclick="login()">เข้าสู่ระบบ</button>
+        <p>ยังไม่มีบัญชี? <a href="#" onclick="showRegister()">สมัครสมาชิก</a></p>
+        <p id="loginMsg" class="msg"></p>
+    </div>
+
+    <div id="registerPage" class="card hidden">
+        <h2>สมัครสมาชิก</h2>
+        <input type="text" id="regUser" placeholder="ชื่อผู้ใช้">
+        <input type="password" id="regPass" placeholder="รหัสผ่าน">
+        <button onclick="register()">สมัคร</button>
+        <p>มีบัญชีแล้ว? <a href="#" onclick="showLogin()">เข้าสู่ระบบ</a></p>
+        <p id="regMsg" class="msg"></p>
+    </div>
+
+    <!-- Header + Navbar -->
+    <header id="mainHeader" class="hidden">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-store"></i> ThanakronSHOP</div>
+            <nav>
+                <ul>
+                    <li><a href="#" id="menuHome" onclick="showShop()"><i class="fas fa-home"></i> หน้าหลัก</a></li>
+                    <li><a href="#" id="menuWallet" onclick="showWallet()"><i class="fas fa-wallet"></i> กระเป๋าเงิน</a></li>
+                    <li><a href="#" id="menuHistory" onclick="showHistory()"><i class="fas fa-history"></i> ประวัติ</a></li>
+                    <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a></li>
+                </ul>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
+        </div>
+    </header>
+
+    <!-- Shop Page -->
+    <div id="shopPage" class="container hidden">
+        <div class="msg" id="walletMsg"></div>
+        <div class="product-grid" id="productList"></div>
+    </div>
+
+    <!-- Wallet Page -->
+    <div id="walletPage" class="container hidden">
+        <div class="wallet">
+            สวัสดีคุณ <span id="currentUser"></span> | ยอดเงินคงเหลือ: <b id="balance">0</b> บาท
+        </div>
+        <div class="msg" id="walletMsg2"></div>
+        <div class="add-money" id="userAddMoney">
+            <h3>แจ้งโอนเงินเข้ากระเป๋า
+                <ul>
+                    <li>(โอนเข้าบัญชี กสิกร 156-394-9968)</li>
+                </ul>
+            </h3>
+            <input type="number" id="amount" placeholder="จำนวนเงิน (บาท)">
+
+            <ul>
+                <li>ควรแจ้งแอดมินตอนเติมเงิน</li>
+            </ul>
+            <button onclick="addMoney()">แจ้งโอนเงิน</button>
+            <a href="https://web.facebook.com/profile.php?id=61580620809842"><button>แจ้งเงินไมขึ้นfb:thanakron yentafo</button></a>
+        </div>
+        <div class="add-money hidden" id="adminConfirmMoney">
+            <h3>รายการแจ้งโอนเงินรออนุมัติ</h3>
+            <div id="pendingTransfers"></div>
+        </div>
+    </div>
+
+    <!-- History Page -->
+    <div id="historyPage" class="container hidden">
+        <h3>ประวัติธุรกรรม</h3>
+        <button onclick="clearHistory()">ล้างประวัติ</button>
+        <div id="history" class="history"></div>
+    </div>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="card hidden">
+        <h2>กรอกที่อยู่จัดส่ง</h2>
+        <input type="text" id="addressName" placeholder="ชื่อผู้รับ">
+        <input type="text" id="addressLine" placeholder="ที่อยู่ / แขวง / เขต / จังหวัด / รหัสไปรษณีย์">
+        <button onclick="confirmBuy()">ยืนยันและซื้อ</button>
+        <button onclick="cancelBuy()">ยกเลิก</button>
+    </div>
+
+    <script>
+        const products = [{
+            id: 1,
+            name: "noname",
+            price: 50,
+            img: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxITEhUSExMWFhUXGR0YGRgYGR0eHxofIBoaHSAaHSAgHiggHRolHxoaIjEiJSkrLi4uGh8zODUsNygtMCsBCgoKDg0OGxAQGy0mICYtLS0vLS0tLS0vLS8tLS0vLS0vLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAMIBAwMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAAEBQIDBgABB//EAEMQAAIBAgQEBAQDBgUDAwQDAAECEQMhAAQSMQVBUWETInGBBjKRoUJSsRRiwdHh8CMzcpLxFYKyB6LSJENjwlNzg//EABkBAAMBAQEAAAAAAAAAAAAAAAABAgMEBf/EAC4RAAICAQMDAwIEBwAAAAAAAAABAhEhEjFBA1FhEyIycYEzkbHBBEJSodHw8f/aAAwDAQACEQMRAD8AU1MpKBwtrGPYHCvM5qSFFrx1jv03xoM29bTJooy/mUmoDvB5nnzGFIzjgEimnpoX+WPG6eDmbAmBNhO95O+PF4bJ7AAlZJJ5TExHr69cOkYATUCiTIAWDH/bEHHlNwGgWM2725TvI9ZB7419TsLIrp5apNx5YO5EzNji6hlH2AkkwFtf0vbDerSBQ1FZADEA7BiWBWZ/dPtHXE+H5V1JavoUQYAEkiDJ7Wtfqe2EpWB4/DGGmhTFjd3tFyd+o6dgOpw44XwGnTEkam5k7e3TDDImYYJY/mN9reX+BODtFizEAC5YwAB67AYycqM5PgqWnH9xi+jlydhhQ/H1L+Hlk8VvzmRTHewkjvb3wwy1Kq3+a5Y/lWyD0AifecZu+SaS3DIUbuN4hQTB6HSLH1jHrZtUGoyAN2dwoH6/qMLMzxFVfwaS66nO3lT/AFHr2GK6tJUAq1j4jzCi8SeSrePXtiC064HWV+IS3ypqU7MQyg+gYlm9YUd8ZzjXxJ4ZGpUrLVuUaSIkEEAGx2g4u43mPCoMSfO/lHvNh23xkKtBqhVpkKAB6D/nGsI8sv1JPJoKOeyFVrpVy7EbjzJ7yAw9umCKOVbLVFzColagDepTJOmRcuBe195i2EdfLkqGAuv3H9jFz1WoxXoFkbno2PYrsb8iMXRamnuhrVoPUSqhKmtRqVGpmLFC58RDHJbsBOzHeMIdMyPEd+Y0khgCJlWiQN/KZED6bAVFasokUc1CuPyVCRJ52aZBGxg9cK+M8J0eJVVSiMunSLFH8RS1P6Fo6q2IjJJlSXIs+H6TGvSBKuNYgtOsAGevadsMv/UlIqUFMQVO/Lzf39MVfDNL/wCpptYlZIJF/lOK/jvN68z5vwqoA9Zb63j2xlK3/EJeCV8WCcJphk0odFUXB9PUf1w64DlPFKhxGpm8VbRAnU4sOS/fnIxn8mHLQQABfVsR6H640WQeMu5RCTXbwE6lQJqP/p+VfrjfkUcuqAeIVamYquWWJqMWUC+kQKadyQVFrGMRekZ82pyLCjSAaO7GQoPqfQYt4hxtsunhU1Sq1KnFaowsSB8qgbwLenvgB/ipzRWq9EMhtC1SI3HyspESIxKcm74Bpdxh4WY/DRVB+8GqN9SFQH/tOBsxw+q3z1KuxsG0r66VgTiqhxnKMuq6CdPmWBPSV1D6xgpqFJwWRfEHVQpj7z741yiHYvyfBmpEvTLX+ZSJDA8j2+/fC3McA1M2liBNp6fz5YKr5fJkkalQ7c0j6gDFTcFcDVRqmJ6n9RIONLFY84PXqFP2XMnUCNKVD9leefQ+xO2MklHM5bMsKbOrIbMBuDe+4IIixti3MGuoIZ6gA38xj+R++CDmHrr4bN/jJ8pYD/EH5GMQXH4Tz23iUq2KTNdw7jtLNAUcwBSrfhcWE8ihsVb90n0nbFfEs89I+BnU8SmflrKIPr/qE8vvjE1cxIVY0k77n2iSMPsn8QjR+zZsNUonZ92Tof3gOm8dbDGWiitRYODk3p5nLuh+VmOliO4mxx2AqnwzUJJpEVKZ+V1Igj629Mdi7fdf79w+xDJ5JqLk/tGkEz+8wixjreNoBx7U4nlmeXUk/wD8gEH3ANx3scT/AOs0nMIGkfh8rMesB7HrY7Tits+5nTmE5+WpTVIv1iD9cTm8k8HmcUAg06OrVcMrkhh2gfqMGZZTZWSVP4Wgg9RuCN/vgB89WUqtSitzcabEQZIixgcxhlklSrdqcKJUXsYuQARBAHzMfKNvNbDndAh9Vyvi5dwqijVJ1CbHUoA1AncspjxBFz1wH8O8DWmBUOouwVrsbHcyOsxvg1OIUqdPWSqJtqAjX1CLE6bCDue4glHnuJVs0WShK0wBJ2JkbE8r2gf0xlFOKyE3ew94jxqlRBAhnHeFHqf4D7Yz6ZbM551ao58IflWFH+lTv/qv64n8KcMSr/iOpbR5AGus7ybyY6dxjYVHSmpZiAFEknYDFNqOEQ3p2KsjkKdJYACjmRzjre5wjz/HGrVP2fLTB+dwNhzIPQfflhTxz4jOYmnRMLtexY9Oy40fw1wUUE1OF1m5MXH7s/8AGFprLJqs8hOQyFPLU5MCBJaIJ54VcLzX7VXaqdQVBCibDfl1iT/xhZ8WceNR/CSdA3tuQdu4wTwesEyphoLE35iw+hw1HFjp8g/xJXavWFNB8ogT+v2H9nBmS4YypB35/XAvBOH1PnZoWSbzceoII+uDP2ijJ8JPGYWJGw9XPodp2wS7IH2RPK8NZeY3PvJMT/PHmfyTKFOkKAwJkiBF9+mJvmzTQ1KpFtlS09urT9P1xTlaVSQ7yWe5AvA5KOw/XE5BMF+I01Ll3F9StTJMwdLk357VBjYcEK5jKMKpDMg8OodiCptJO7CZB/g2EPFaRfJyyEPQqah5Y1K0ib85CScaT4Vqp5mUDRUTUx52EXI5i4PcH3nqJSiqZ0QdNeRPkeFtl2LuxIuEjYyPsT09cZ74nYGvFT5hFh2Atf15Y22lKfh0qj6hTEi8Fu7EmDClBafXFGdrvrLJlsv4USarhmMAbk+UH6nHN05OXUtvgGkkYxGLhaeiCWVVA5kmAAI3kjfp6nGp4/WXLUhSRwGRPDVjyE+ap/qdy3sMd8P8VDsa9TKU1SmJptTpnXO0xqtaf7nCfiFJ8zUNR8rUWRf/ABAAIgWDJItHMY68ME1FWLa9AvSYSpapPmjSCWO8ECLnpiqlwWtSoVKFVQJnSQwIM35bX69cH56nTQKpaQSFECZ+hgC2BMrxIiKbyFmEYmx3hSTcH9bb2wK2n+ZgspmO4er6XMjSwhgecXHuDjzh/E3pGabNOwiR9+Q++Nq+UpOpDU1eBpaBoqCLSSPLUWwiQdoJmQF54TSgvTOsC5Ugh05wVJ2HUWx0+r3RoeLx3xfJVQVVgTaH5HykWJF9xeMDUqSklstUIixRvKwjmrCzD3xKmtMiQo73EjAzIuqQGWPxC/2jE60TZ2czuYQEM2ocw6ho+0kHAuZIrPMEMAplTaSAflPKdoOGtJ0PzNPWF9pg3GKa1Gh5m01YIAJGkCBYRcdOWGpjTOXNuS1RkuJl3GmbfNHUz7wb4nlaj1gU+V4mwtHr1GJ5VxpCqlbT++ARHvywUsAAoySDYR3mBvynnjCcqvuDdi+pkAp0ncbzc++OwTnc3S1ktUUMYJENaQOhjHYlObXP5BpBaPDaTS0keXY9RefcDlgfPUSTJJ2F+2D1pLTSEq05Fy2956ICAOVzPptgfiJZtLKVmSGiQBzm4HT741t6lTHhot4SzgskyhFw224k+y6tuWG1XilOlT8qkn5ArfKoABjfzXN53YsbwMKFziUk8XSSGgLeLyZ0iP3W+o64KynhZqmVTytckHrYSBO/m9J9cOXdoSRTRD5hmq1XI02LupIWdlURdjyRQSemNJVyNRAmWoPLAhqpYLKki0xIAAU2vewJxTwKhqdXYRSoatCkSFcOQCeZdjpPr7AMsxxQIWSkp1AiWsSx0iB9+8e5jOc8/QG6QZn+JUsuoDteLASSTHvE9T07Y+fcd45WzDQ3lSbJ07k8z3wNXrV2dwzuzzeTI9DyieWGGYWjmP8ABpkIymUJCgVJAGkturTtci+wxoo1kSigz4L4Qz1vEcELT809WO3raT9MP+OcaBIpI1jIZpEbGR/DCs5tsvTXJ0llgJqvFtRuVHpIE+mKsnkm1eI9NQORLqB9DBwmk3bFWbA2y7u1lb1IMH+kYL/Z6dKnLOTDTvYGwI77bdsMv+p0wDPLfSymPoTjqfF8sbeIF/1AjDC2KafEjUaKqk0xsosoHKYv+o7Y0EgKWp7KLqOn5Y+2KRTy9SQr0mn8rLP6ziOZyNYMHpm/5Tz/AOcQIFqZSo6mszeddk5IBeI5kxvjRcIyVWsiuhKoRJYmBH/HtgbK5qkrf4ij9p02oagNXZjEd9Iv6Yq4hnKubKUlNmKsqyVVVm4IBF1hgZvtGJl5K0qh1QrItfwqdSvVcoQ2kgU0B2Y6gfMCtoB574uytWkjaEVkZkYQQAD5m1GABBPzRbrAwp4zmhl9GVo0yA8KzqJgkgAd2236jHnFKdP9ry5dypVdS3Pmvs1jMiRJ6m+OOVykqxd/2H6mKQGtao1emGCFKqkQNmKiSWBFnggT2EWw2ocKfUDRDUpJaoy+YwAFVLzqneIPy4E+HkhgMwhIptKG9tQiJHQuPKeoxLiWZYNRYVvDpkMzatmFrFSd/vvitNTtdgbuhlmMtmRTIpUdDTZnSRHXSrGDc8iOwm2czXw9n6kGrVVyDMaiB0sIAH0wRTo5bOaijGlVH5THodIMHlb2nCHiH7XlW0tXrBZkOHcKe2+/bfHRDtsybWxLO8FzaspNMuoMnReOnMkm3TAOYoAJLpCC5kGRfcrB26iMGJ8VZhW81UmQDsCIMEXMz5SOfPBp+JnazpTcRuVn6wRHrfGqTQC6jUWoBof/ABAJV1iSYuN9juQbXxylah/LVH5TE9SsGx7fToKq9TLkytKpTgyDRqBh/tZbDtIwNn6isVqUyTNmBGkhh1hiBMg72xVAeVqjSQQNU72EiJlosD+t+l6AlTmpZrWXbrueWDVrOyMzrB+Un8wiT7jf698eZXNqbgFgdypVvaABsO+J8jwLBXZXBJVdJuskzbnpk41XAsmJkhioBIEEgg3EyJJF7Dc4COWRgHmY2lLg+hAf6WxpwzU6fmhBTU22AYg2sJVpubb7nfEdSVqki4GL4rmqutiSQpJgqpFiYkjlaTHLCmvxGSwT8C2n2BYz2nD3LVqTsVR6hN5lSV7/ADGYv06YjXoKsoiodW4gXE37/XGqpbol7iTxMpU89QnWQJ7xad9zGOwTW4Ll5Mq47LsPSce4u48SZdoYcTySKACzIJmdAILWgkrIHO0c/UlfmcoWQhXV52hgAxBEg7HmvK03wWKmYy7Ms+JTmIbaD9SMMeF8OpuZpjTLFgsiAxiSDzB0rbl0G2MnhXZnEQ5vLeNVVF/yaICDkDYam9zH+0Y03DculMArChQCWAF9/KJmB1bePuqoUCFGsxqvpA2/1dz/AB2GAOM58FRR1EJ+Ix855n06DsO0VTlgep2adeLLVTTTNjWWnK7Qv+KY7SFubmfSV/Ec/ozIEkaWBJvBkAR9Nu8YH4HXRBl6Ykand4I3BVQCekkGO088TzNcnN1E5nTp5SSo8s8jOx9vSXBKRLy6KOJ0dVaolwJ1Ei5M3j0vvifD6Cq4K040eYu5Fo52mD/HFPGqLO4IGpro5a0FdiR3HP8AdJwLWARBTksLFoMam/8AiOQ9/TRbbhRoa3EqdRFRah06ymndrBYYzeDdeo0/S+hShiql1IuGGwnYTPmHYiMI+H6EZPIDUJG99AJ/84v2tjRvlqjMsRojzEkggjYr33mbEYw6kalURN5KMzWGmK6qwNzpkNa0+W2881tGK61FnQfszKF6FSDHWf5fXDJ2pAiSCRyFz3sMVpxEMxSnTYkblgQo94/hhxTQhTleC1NLalAZhEhptudxuYA9CcXZXhuZohhTqqJi8kEDsQDHsJw4zOcSmJqOAN4t/wAnCz/r6kal8tIbubkn8qrvJ7jF22FsspLmDaqKdVQfxTIP7rQCD3xsuA5NVQMJl4+bfpc7Em14EgLNxJwdDiz16yUaSEayBqNzE3PQQJ6+mHPxnn5Iy9MkLTKGpG9yAsH906Se7L0xl1E3grLwDUeICtnlUgwrmBPMBiSwi9xYWiBPTBPHc6wzLml/mKqoCRIjzFrdZYXvtgbg4Q1XzmoM1HWaqzcgo2lx1k+U9yOuFmQH+PT8RiTVbSx/1yJ7XM+2IlBfLshuNS8DPgfF6z5hJuKlM6/NuFRhriyzIWwE2MYj8R0StFFYFrkAA3IJLC/oI+2E6U3FYeVl0ErqH/4z5h9bf84O4s4pU1cASa7zJsZ1f3OCdKcaK/lKstxLK2EGjUXZuf8AuHL1w3/6xTqr4WZ0wflqr8s8p/KftvttjN5zJq1RiBMgNFp6GOUyDgc5dERidQjvB9OeN3FPcyoZZrhBWoQwDDkeccj3EYorcPTlCtym38b/AK48y/Em0eGZYC630so5gbyOnK3ti/K5pKs038w7wG9YnFJNIf1F1TKQYOoegkfb+WJ5XKrt5rmdwR05cv75YbfszL8jBl/DvuL6b3nnG/bFS0QWTQdIaKhA6SdQ5SBBE+mE2UijMg7KRA5bd/64DMiNAufUgdQBtPtgzP1Ch8yudRkG4mPax2scSpkkhtRCyJDH7XsMTtuDCuD001q9RyFHm333UCZkQb26dJxbx7N+KSKDKEaNcfPG4VieTGD18o3AjB2VqDMzT0oS8tIE6Z2BMyRBnfn64zOeo1KFZlKrOrTMxKi03BkG0D+WIWX5NMqOCNUhIAZUd4Rfzby1ut/X6YgMgoZkVpAYk3liT16bC3bE6qqzpK2DBhOwvBnpG/sMA8UzIoLUqqPPVYXLbnzEmOUD9RjWKcngncIqcUVSVLTFvlB++Oxnaf7OQCQZNzM/yx2NPSj2f5AbLOVjqRtWllJpvIkNYkSPymD9xysbQdaaOw0abgr5o1nSVgxMCNRtMfXATVCx8aR4bqhCm/nDAaR7Aj3JwflaRZIUaf8A7mkm4JVZAPKwsLbnrjC7iJYYlzWcqGkzqUBE3VY53sygk7jbvvivJ0KlVCatIFY3A0sfQCx9QBh2tClrLMS7AABReB17tPP+WKqnHaSv4Yp1NXQKOfS+LU/6UTYHQylTxUqFCIgDsskx9/tgTiit47tFuRixKrtPaNsPKnF6QALs9OfzJv8AY49p1pkU6lFpJOh5B8xkXnYgjlhapbtCF6UPHA82qqBFjaoB6H5h9wOouIKKEkgie149Bg+pnWpsC9J6LDmkMG7CREc7HljnzPiiCyhzs1wj9mFtD9/lPbA7+xeGKKyaDrAuswWlrwbkAW9D9MOOPZgnLrWpmTKsCRNj6j03wMKB2qQItp06jM8hywzbLacuwYeXfSTeAQTMbc8Jy2ZDsT/DuZrEzpJUC8AKAAoHpMC/uemGnEP2goGVgATdEsR/3G5b0jACpUSuIYgRAiQAItABtsMMcm7VFemwiRAPU8uc7xfnbA97Q5U8mcFB6hJP5gpnr3Jvbvi1ckUAnVruTJMIJj2OHNVgphyApAhma5BEgzvsdrxfEeK5VfDpMXsQdhOobz9xz54eobLfhvRRFTNN5vCGhP3nawA9BJPYzik5hyWYiHeAZO4LAB2A5A6foOWGqqlCgjVGsJKBh+ImTUbvGlR0gcyThMPMQ6rEmSXYksDYzFgCJ2GGmnlAnkhwPMmhmAVEi6spBIdTZlax3/XBXxHlDTrqUJ8MqalJuogwP9SsII6+uLKWVmo0SYPlAEk3O/QYZcP4bVqUHpVlgBxUomxKbah2VgBIGxve+JsptbMvzNIVWqoIDVVXMU5E3dQXH+9W/sYU/EgHgKG28U+oMT9b4b5zKsiUm105phlOtoVvNrUSDIIOu/vyxX8Q8NqV8ufDp6mLqwAvLbSCLXB57eb1xklH229hxd2Zyg7U21G4iDLKI7i8kc8S4nl9aeJSgj8Q/jHIi8/0wyp/CeYZVFSnTUqIuZMdDCkW9fe2L6PAcwjF/LfdFa20TJ0wfrjfUm8EOhHSyYGk7QgMfSfT+uIUFfxvLUcCdgbRv1w+r5WToqAgkEA8jI26asL6WSrLWGoAIs6YPtYbgdZGFeSbLGzjJXp02GtajqDOkEeYQ0wDKm4JmIw9yvEFpr4b+UlfNJ8yztMQxNxLWaTzMnCjMALXDi7qp0dmJI1+irqI76cDsiU2Y6PKFBEfiLE2tufL98TOCaKUqQ3bI20HRoMlCv3MMzE7gzcbzjJ06NarUEIHVTcbDfbptzxouEZpNSU2VlLOsIWnSxMSpItvBAsQSOkeZAK706dGoNOocjcSCzM0Xm9vQcsJNxEs7AOWy5om2wLqGJIKk+UMsQWPQGd8VZ/W2pyC7GGuQGbYSQBIsN7SR6xuHq0aYemhQsCVkkEhospABIOnsT2xm+IUK9TUo88XK08x5vVlNND/AGMZRm28o0mqRn5qeUMgBb5RB/527YA4lkhVClwCADdSwjbbcGescsFotZXC6KgabF7Ee5ucVZdmOpW0hT9t537frjdSccozV7g+U4ErIGCGDtJvHI/MMdgxs/U/AkLstuX1x7hPqdZ5s0uIXXyZeiyIPMvyR+LTBPu1/tgjJUPDJSTdVBBI8pVEUD/UwBb2GIUswpRalFgFmS0Gx1+YG0gspsPWBa9q1T4wV2QU2O5PnBb8Qte5gzyxKbtxJrFFVKpraqumXpE6TtM3AB5XEfTE8nxFCy0KrL4unccieXQN25/bHZdNIapJ1Go40gXOlipB9Jj1vyxRm6UFtJWmrDWT4cm9zqOwvONFWxBzcGYMS58Rjsx6enLA2Y4QxqBiF0hYgGCSAAPsAPbFoZ2pNTdw6t/l1F82i3lLRcrO55T02x1VKieWSGB84HIzt0Mc+/pjWEW3uNRsfftWYoKAwJUmIYSB6cuW+PaWcqO40LBPLywOpupMC1rnCTL1KgsWYA9yPa2Nfweh4cKP8wiXb8g5DaNZm07XPQYJqhvA3y1IIJcywtJ/D2HS52G3rtRm6xLqh/EGB9NJHsBqBxQuZD1ii/JSF97uZH/tE+5PTCjiuYqNmAqRpXSGuLiZIgm4g8sYqNyI3YyzObAQVANUeUgdf+f1wFSz81VZydNpWChHMFWuOljIIkEXtOhSdiQAFY2AY2fmAL77xJH1jB+Q4YWEVaNQT+UifTfDVRwNKhxQ4UuZpeLTJOkNFhBUliEYSYZWLAHaCAJgxxyRZaIdTFJyWi5ZQpKFeupgFjF/AMrSyrjQahgwfOCACwsWCAG4mBIBBkzhevE6LU6vgB9EqalPSpEGZsIBB3Jk/KOQjHM5vU62LdblWaopWYvmKyCP/t0/Np/dLbW6dZOIZbM5SZQvO0SL+wGF9dssagInzR5SLXMW6Hsbb35YX5WufGK01Mlitttz25Y6Iq1ZFZNUOMtTRdNBaYYwsmbybGwIJiR7XwbllzNSC7lRuFWAfftzifXBHDuHabkyx3PS3T+mDan5V+v9/piJSS2IcuwuzOVsyp87S2txqXVIBMTvDkgm2+I0OKVKWhKZP+KzKCxLTCMQbmykxYcp62NqUgq6QPmN7nmSSfU3PLAfEaAD5Yj8DH706hH99sc+jU8lQk0ToZnx18Wm5p1B5WViWQMPwspsOxESOmCKWaY+WqrI21mJVv8ASZuO1j2wNUpeDX1geV/K4/8AE/qP+MMisC0FTyIH9z9caJUKTsixkQ0Mvcf398A52lTYAkaGBkahqA72mPX09MFtTgakkgD5bk+g/SD25bwy+cSpMG43FwR6rYqexxqm+SU2Jszlxqeo7KU2ENIgdYvMk2jC8Z2kCEpozEiVmwMm8E3MmTbD3PcJJOui/htuYEg89tp/njPcS441N9JpkAWsyhz1mx0jsI9cUvCLWR1waloc1K7KGEGmiiYa/wA1id4vNvpi1lrOHbWWAb5VLQDGqSiLJNwflvuemEuX4hTp09fm1NGlCQSinnyMHfrgvgGaZhUZW84gg6bT0PUHnt9ROImpFasC/NZKq7FkdKk2dLHV2Zd46WkQNjhb+2lSadQMyAyoY+el/wD1sRIjpscbGoMvm6esqCR81pZD3tJHQxfoTbGa4zkqqEMamqkRZjpYf7jMdN49MXFLZobLMrxUhIqHxU1AB/xr5HPmG+ry85m/mOAaqgDWsVE2UXtMwG6GLd46YEy+pkqm6aXRdI/FIffvbfuce5Mgu+iQAsEnY9fX+mHpV0OjvMbgCD1dh9rxjsCDPDp1/XHYel9hYHLZhSFAY00uGAFvm0hbEkMDcFZgrzGB+N5ALTouzBwoglTOofhkjlbrz649zrIyo9MEI9TS45rLEkDqCNRleXMXx1OgFjLNc1ELO28OWhewEqQPbCapJ9n/ANKXY9+JFWolJwT4hp06xj/8jMre+oaif3sKM5xuopARiNFiw/HMcoixk+5wbxWk6misC2XVSpI5Ozab9wv1xZ/0ikrjU1hEAkCOZmbTH88aRcVvkTqyNemXRmdQlRVEuo56hMjaxXebDrhHURyPEaoTaJ6wIiZ8zWjmeuNhksuStUMA6sJQlvnkrq7Cb7f1wjzKNVcQoCfKlRiq6u6A3KkzECIjBCbyAuyLMDrJMfhBE36nlbGpFT9mypcn/Ea99yx/WBf2wqyPD18VUNVXMyQNRsN9xHLBfGsu1c6ta06KWDN9yBz2P0w5NNkvLPfg9AKNWoZu157LP88I8mrVKjVGkyZgEXk9SDt6fTDbI5qmcrXSiS2kgSbTrhZA5Cx74Z8G4HRy4D1oapE6YuPbl7/0w7pybC6bCuC5CroDUwlIGdTEFm3IMSdO15iO2HNJ/KAKhdVBNSqxhY5iEADG3KIHMzdFVz9TN1BRpyEm8bADmfzHsbdsX8b4tS8VcuZ8Jfn0iZI2UgfgHYb+mMJJvBNsb5LOCrT1L5KepgoUaQQFIlgsC5kxFrc7lPSzT+FSaNSOBrqIAKgZZAbVbWLMCGmbib4NqVlfQtMjRFT5Y/IRHr5sDcAyb0lKMQUbzAkgQSLgyf79zjNQSsE2Ka9AIwcqpRifMt1aTOoTdYMgryJI2xpfhrgoSat9Ti8/hFz6ybSMdlOFU6BqM76kZtYpjzQ28jvIPTvMYX8Z+JC0rTtSZYDAkPJsZ/LzEb274rL9o3nY0Gd4kNQoUyPEI6EhR1aNzBsJ5jbfB9GkACT7nr/fvhF8J8NZKepySz3M+lgTuTv6ThtxrPrQpPUawRSfUw0D1kRiWs0jKskHYl7jafSZi3OwA7X54r4uYanv/mDptBH8j3OkczjzgatoVnADnzOBsGPmI7xMdB64WfF2bCNl5YD/ABlMkbC41D0v/wC3phJe6iluOs/l9dIi4lYtYjlY9bb/AFwv+F807UxTqkeIpKnkbGxPQnY4d0BNMdiRHTt/D2OMHxFxls94hqsFKyViZBsQO1gZHphpXgpK8G0JKmYsd+/f1wBxvg61AalMBawHlcT2/Kb9jyw0pOHXUL2+ovBwJ+3LSZabwqsYVp/ETZT68j7dMOPYlWmZDKcdzdKmXqKHVX0mYVhtawjnzBIwYcxkc4dRinVMTrEarQJM6T6zO2GnxPwt6iAU4EsPEkWAE36zMevbAS8HpKukoDO5bc98bWiinN8MYLpAAHIgiI7Rizg9NKTeHKyw2m5i+2IJlVWy1Tp/LYj7ifvi8FFuAZ7L/LA84EZunn2o5lmpmCrsDOzCT5Tt5dvpOH2ZraqZzFBQ9Nv87LvcHqR+VwPxD5hBvEYVjNUaeoVFZmLtfwyecxMR98Ro/EdFG101aSIIJABHQi49OmBxd2WmUHQtKrUouWpmGCMPNT+YQeRUavmFusYWZeuTTqAbmABsbz9R374O4x4ZAqUfKjHUpHlKt+JSQbGCfWcDZeSWLC8eXTAJuLjkI64bSWSrsqelo8oYGOZP9ce4u8VRYso7ST98djP3ANKYcFXQIpN2DSjG/OAe/LeMEZ2HIcQWHlO4C7yRH47xqtadpMhZepe501GEjVI0DaSATLTsdzB2wSlHdAdS6WUshmDIAJIurb2MGT9ZlHNk5ojmamkgvCmABeQsTsIs1258sVUKiaChqIxkm4IBn80kzt9PuTSXUniMSdiOvSCTABtP9jFZeTIamF5S87QR1vttGBYwDuylatSnSa/iVHlhpuoKoxFuYMAd5xQraU8daeuo5gKyAMsyGBYKGOxhj2wRXybtVUqFNACCBBkGee9hHPljxgaWlFBhFKqJ3M3LcgoAUyfzDrirXAFTU6NEF4FKo4C3ckLIJ9QPKb9sZ3iJrs2hjz8ij5QvIrHLvh5+wU2ANZmqGSxCAkSQBuImI6jfDLJ1aiwlChVAnfZR3JnGkeol5BOgDgXDcwKbrRp+EWCzVYmSQbkTYWJjTcdZth1S+Fj4QptVI5sV3JNyZPXBa8MquAalZh1VD9p3+mDqORprHUcyST/z3xMuo2JysDpZAUQaVBoLHzuxB0DoP3jyx6vBaCnUPm66p/jGL6uZy9OxdR9JP1Iv98AZn4nyiGNRJ7A/yM4j3PYVNlea+HdT66VZqb9oINtotPvODMqMwkLVVGT84P0BUi/92xBeKM8hcs/SahCjr11R7YpzucrImpvApDqWc/QCCfbCbezAhRqowanSqM4U3AABW9gS14m23QYnwxFRlBoopdyFViWM7lx+E/KCIAjEuF5wVxqZVcrtV8JlnkQrPUZyORkAXwZwhRUzBqXhVKrBtuNRiLfLEzy7nEyd4C6eDR5dIF8YD4w4p41VaCyVBE6YOpjYi/MFiPUnGm+KuMChSiYZ/Kv2Jb2/UjGQ+HeFrVK1FaQrgFR29Njtflviumq9zFFVk+g5BYHSB6+3fnfmZxjvjisPEppYaQWB6GQL9rT9cbWhZSeVvSB07Y+WfF1fxMzVtBWEn/TacLpq2OG59P4bWDU9QMggMCNiCLH3EH3xjPjmhSNam1TWQAbACOV5I59Jt740vwfqGWpBtxSUewiPtY+2E3x4QPDYkEBiSp52/sHFJVIa+QZwHi6ahS8wYr4mlwBCm4UexkDkIw24tkRVpshsGBEgfz54+b0swVisT/jVHlDzHOf6bbDH0Tguf8WnMQ3MX33MduY3w3DTsEqbtEchnabKtIksdOk69yRYgz+p6gb7qc7VSi7J4JMXLJTBkdyTqMfTFXHcifGkFhrAKsPwuu1xvI67xz5e1a71FWpMVaflqDcMvJo23j63wksUFpllLi1Brawp6OCh+8DBJSRIgjqNvrgNXSoClRQDzBEqfry/u2A63BNMtRdqR38vy/7bCMVGicDLQBPLA2ZytJh5wp5eYfbCJ+NZugQKyK46mAT7r/LBmU+Kcu9mmmdvNcH3H8QMaUx6WWnhCAMEsrbqDI7EdI7YS5vIuoK7A2LDntPp0j9cN83walVGqm2gxZqZge4G+FNY5vLyCTUTkxMz9bjBVopA600Ajy/bHYj/ANa60ln0/rjsFMdFtLMB6bVEEgtoWQTMwCYBFot2AOHNDLtcs5MmQB5R7xufX74o4fTVQEAAIE6ReOk9z/PEuL5kJRdtUSNIboWtq9t8ZPLpCLK2eVlQ1GIUkql7DpOxEwTM/wAxXWBSfEC1EJgSPNfl0O8dcD8RoOMsgUrqUrdhIj5TbnvgzIVFcaCPkNugjb3HPptgpJWDKX4fTclqTQZlhFx2E/LbbHmZJ0xBIQbASx3hoiCe0DAeacLNWSrpqpi8eaRHQEc74Nq51VNPxGAZhGoxBiLMeR80g7bzGFTdCyQermgNWXq6h+VgJH1G/rGF1f4mzyHSxhuhVZ9otj3itGpSqiqlRhqtBMienod/rgjLcUpVWFOqAlUbHl7E/pjWOFdWUgccVzrCSzj0thrwnKmsAz1KjyDNMvvG5UmBIN4uLETgOlwCs9QaqhIVgTtpI7CcbDK5RU6+hYkD0BJj2wpyVYFYqf4bpeNrWyx8m6zEGCbkevTvg6jwmjSOvQoaS0wCb9OcfYY84rxullx5j5jsNyfbkO5xmc1mq2ZJ1OaQ1RpM+bkZbm3bEJSrIhjxX4oUeSgAzD8W4H03Pp9cUcM4c1UnMZkkkGym0dwPbF/B+G6bEg730qOdpIAJgdSb4Y5oyRTG36X/AI74TaWIibBhmmK6QNLOeX4EuFO25iY6k9LveA0wi1DsqmB0AAn7A4RH/PSmoJL6m7mIAn/d9sW/EvEPDCZdGAnUXaYB28sxte/oO+J03gSQg+K8y2aao4+RB5f9IO/qd/pgH4GDDNJBOk6tUGxARvm6ieWGeUKDLZgagWCMTfl19O+Kfg+iBmKTeIpMsYBE/I3LnG/tje6g0XHZo+j5nMCnTZmkKAS3O2x257nHyvhWWNetDEkk6mJNzBk/WI98bT49zxSgtJSdT7jqoBkfUrhB8ApqD1O+ke1z+oxlFaYORKwmzacEzI8R6Y/DH/uUwPsMIP8A1KSUpCYGo25/Kf8A2+3IYC+E+Is+ersLqZg8vKwCH6T9Thh/6moTTpELPnInmJU222MfbFJVNDqqEHDq6HzhIi2qNZXtuIHoMPOEZllqB/GVkNiAse+/L064y2QY0j8pk7gEH2MGx++LsyFUlvMNTDzLuth9jPPnOG8MXJtvisjwVqW8rKbmIk6T67/x5YXmsVisvS43kcxHMYJZfEytWlEnQxUdSpkAe4H2ws4LmhUoj+7j+kYKxYMYP4VVQUPKR+7I5HmIO45YCp8Rai2irGmwVjs3qPwn7HttgGhm/AqlHMITqUn8M7j0n6YcZ/KLVQiLH7YGhF9RUqCIBB5H+HXGb4n8OrdkHsN8LkztbKvpglB+E9OqkTHpjU5LiSVdjeJI5j1/niqa2KyjFUqT05NFiGEyJII/n74Y0PiZ1AFdQwI3FifbY/bDXi/CtXnpkK45RY/ffCemisV1RbV/G31v7YbnSt5GnZea2Sbza9M8irSPsf1x2A6nDVJnWw7DTHtInHYn1IDpBuUTRSJV9TP5Q/Um073IucWcZgimpmBNTy7+UWi4PM88UUDULUgwUBQWMbaiSBHoBPviutmC1diPlWEBBMiN7BSN5F42wnd2LkZ1KoOWYgRp3UctJEjC+lUKNrYLAjSZixHmEEwP7PLBeZXRQrSAAULeUyZO/vP64Vvnkpsga2w5QDvJHKDAn+WFFXsFE/iZJkjZtFT1gOD/APqffFFaoBlKZa8AoO8lRb/tn6YOz1VnXywjKxiOhgiJIt5Tz5nE8zXikmoeYS0xBmOQn5t49MUp0kq5HgF4CXemaFVY5oSNryB7H7YO4f8ADDVQGzC6Vi6ndvofKN++BBnnRNNNTTP5kCFpPMlhqLe+Bc5mGZzUlnL3UamKg7EQTAuDi7zawFm5rcRoUVC6xYQAsk25f84TV+PVax0Zcaf3o1H/AOI9zH8EnCMo7HXW0aBJYmbegFsN8jnBV1BV0UE3JsX5x2UDlzkT0xnJVlZIeCA4MgPjEtVqMPMBHUEMJJBNgImOdxbB2X8VyfEOuTPmQK0zN9J0n1GJZZHIRz+IMWHdiukewEe2D6jpQTXUIHf+XU4zTk9wtslXYUqZ6nvueQxVQWxY7n+zjP5LiJzmZMWp0rgdSZCse8T6R3wR8RcRB/8ApqRkx5yOQvY9zbFODToGjuEZwvXeoDAINNesTJ+v9ML/AIgzR/aVH5Ra+0kyf0+gwZk28JVK3FtQnuNRHtJ9sVV8vrrVjJD6oBAmAAI+0Ycd2wTKsgGfUGpnzoyTYEgg2jfv7YO+HOC+HWpPYENEOCGv5TFouD23xTQy1Q2II7zvg/hdKujp/jGA6mCLETcGLSRsY/oauAsq+LaDvnCwDMAAAo5gbx3knBNHK+FQqCiZNZmKTYrK0w2r8pVke3WBzxTxBKrZiprpAqHbzK+kgajBJkQYi9x64ccVZKdBCfOllgjXqN2Ckmxix/7Vxh1Oo00ilGxLw3K5fKKA9QM0q5jaVNojkDzPP0tb/wCotXUmXIFirMH7QlveZwBWehU1I9BgVAshXUoAtqGoaedoti34nptVoZZaSkJ4ceYEGASB1E2/THR01m3uL6mc4Y5c6VMDnG/9MMBUA1ODCqYHdQIP3/QYjk+EVVU6YvaZuB9N8SzmTYKF0mJE9IAP8Yw5pNi5wOX40aNClmB+ZZHMgnzD1ifQxinIaaVd0RpRoen00sJEf9rR6jCjjWrwKSRAALEG27GN77T9cDZOmyw4InlfbtiqWkfA++J6I8rRaYPocVfDHE2QClUMj8JPP90zznbF/GnFTKs45ANz5H+xjMo6ESzX+/2w4q4gtjWfEXDfEQlCFb80bjmMZdn16nUlTbTuIggTPfGj4HxYOPDcy3IxGr+uE3GMsadePwvcX7gn7x9cEU0Ndi7K/Er0/LXUsPzgQfpsftguq1LMEVKLguL6LAn2N5+2EgUOGWJ0mI/iP5YVtlirHSYva8d7HbocWoJ7lJJmj8aottBt3j7csdimlmc4ABqJtuVBP1IJP1x2M/Sj4FResBlLnVUUT6QDBPJZmB64Fp5R4Um7mDpnyoNV2jYt0mb4q4TlwQa9S9p9f3vU7YYcPEsXaNRvaYA6DqB1tiZ4wgeC+qQFImNYZfdZYfZW+uFmeoKCzAHxDadwsWlRzJ5dPTBqVB4QY380/wC4kfacU1npBhUZQ5MKAZMGdwBYEiLnERtPA4nmSpuFAO/JdgOhkDfti5SSzKSbQFM3NtsRrV3aoAnlX8R3tbygna3THqgayzFtMgabAHYb7787e+E7eWS0rK8yjMdADFbBm1AEeXYnpttfFjZVdMBwsDcAmB/E48NRmP4lU3lQD9bTP8sW00qQSKusH5ZAPrJEYd0gIvXSrFFC4VYHyke5JFj64ZjKhUWkqgLZnJNlAMmSept3wDka5dwrItrkgwQR+6dx3BwBnuLl6jQQQhhVYkAR+MDYnuTOLjFthVjziPH0o+WmNbXEmwEfc99sY3i/Eqlcgs8m89N+Ucv5YPzFP9oWiCW/HJHduf29sEZXhVKn1b1Fv5Y2jph9Rqo7lvCT4GTaopOuoT5oAIAAEj3mJ6nEOF0vDoPUb5iCZO//ACT+uI8TzYYpQUXBvGwkzHt/LHnHM0DpoLckjV2H939sS7l9/wBBO2MOD1JpCeZIvzNjI/3H6HA9FKjVGRjq6Wv5dr87GPpiDH/DNMGCCrDtBuf0xOiXLAuAf3gRf1HX+mMu7J8lo4PmyTpqFF6u21uW5n7d8FjIIoPi5wN9R9YbCIZKrUrsFUkTAaBAtubRGNWmXSii6wKlQ2VQANR7DkOZPTBOVJKwbKXpLXUf4nlABUvqk6TcnUIdoPImDA5zhll67qo8RVqU0GoKCWI0g+aTB1ydIsPxT0wBXpg1qaOZdlZ3vAjSUCgfkGtj7zviWTcVRWEMGpqKK1G+YqRv1ksNUd8cs068DjKibZwhzSWr4LxKjShpMp+UiFBQHvqvaZxTmzUKKlVZdJkA6bEzKx5WEz05TBwO+VqVcqQ6k1qRdAT+NCQSPSIienfAVCrWpBabBqlMfKwu1P06r22xv041sDdkmyJcHwq1RD+Uk/8APvfFWZyTA6tbCRfzEwRvE/XfBz1UZSbMVgkDcfvAbj9cVmoT5WiohBIPO3Kev02xrZNsUqjaBcsLgkTa9p6W622xKtpXSHG+xA/Xpi7O1SjU2pkiAZPrEahzBvgqg61qbSoVwCSo2MfiXsdiORjA3WWVVlfDgpp1KKt/mKwW+zFT9J6YzNKpAKtY9f5jpjU0cjYFbNJGuLJB8x7mLAbkk9MJeM5dFZgtmd9QDXME8uS/ri+nNN0XFdygCFLE95W364d0c2Myi03/AM1TNNyANXb1I+tsZ/NVdkHygbDn/IYvyItonvi6xbGw2hlylyx5ydOx+v2x1alRLCoS9rGFtgenxJtUspk2Zl2JFpI2k8/64OV1a208tp/rhPBLtHpq0uj/AO047EiOpA98diNQgbiBJKUlso8znsBYf32xZk67FKrsI30jsBb+++FaZqqwMKJYztb3P0+mDsxVK0Ydo1ECe1if774HGkkU1wW0qoNBwCbQD13GFofSxJZpACzaDvDf6oJH1wbTqyrAzBFi0Xgg7ek4vrZLWF8ILqF7+bV6TzxCmovPI4oE4Q2u+kqguAW3M7x/HBzP/l/vNPsNveSD64Cru9MBWklnAI2gHl739sWZyofHpAGAFv3k8/phtana2E1kY0IBZTtqPtN/44AzObFByCTO8ASCOp/n2x5xqQSFcLIVpJjtvy2GLuIZYVqKs1mS5jYjn6rzxMUsN8iXkvy+aSrTNVJDRp7iSJjqYFsDjLUwYNifxiSL8m6H7emI0ctp06R8oJkbcufTBfiu6wBFxJIgH96N/Y4LV+3YRRX4W7LC1Aq8gAfuZuT1+2PclQq0gV1alOw5rtME8t9+2LFoVUPlqah0YW9BG2CfHPMYpzdUDZVWVJmIYc+Z7YU0sm619bGQQSW7/wB/phvUqqeR++KmIvftBt/TEqbQkxZk9VUVWFiw0r6d/U4MpcPRY31GAAhIJPscSosKflRbbkn+XTvOCsjm2IJSmoYgDVcxO5uZgdMU5XsDGS1ky66VBeq0sQO/U8lGLOGZYljVqHU5+ij8o7YHymTC3JJY3JO5OLuMZzwqML87+VQN5PP2EnbljFq8LkigbL5tGzRYkaj5VG5hbk+hM4I4rmCiV1FidDAjeS0H6BfucAcKyCUfP+I7kmZ/oMX8XqnxYH5V/wDOf4ffCaTlgfJLhXEv8QazpLCOqueTA8jyIPbCzPJmkrMqv/h6rExYG4BnleJ7YYLRCkr+EmR2Jv8AfF2aqhYZ9rKx97H7x9MaRxlIpCUZ2sDtqPXWL99hbFtOuB5iuhRBbzEyemxk9/8AjA/GOFhV1rOgGdIXV9Og6jCyrWQsEcsBtpA+Xt/qxpSksFKNjOrmqAfVoZnIgRMkehO0dsXZPOVTUTSmgA8ysx6b/TATIXgU3IQCDIAPvzPucSy1Lw/MGmQQDYAdWxMoJrz5B0h/SzCaBRpsgFyqjWST+KSRBvPfCnMU7sy00qNN/N5h6yAR6WwppkWKkyjEgyecfxGGvEKysULeXUPLUHzIRuD1X+/RenplaG8iSvUMkGl4ZO9j/P8ATE6BhgRMTi6tnatM6KyCoOTLYkdehwOjozf4ZvvpIg46GnQyFJHYkiRzkd8G5RKgs311Qccyok6j/wBo3PriVDxHNl0IPw7E/wARhOVoTYV4VM3YknmSelsdis5FusY7Gep9w1nUBC25LiildKRN7tvfnjsdhcP6/wCQWzPah89btTt2sdsMcp8y/wCofouOx2M+r8ft+yHyj34sPnyx61IP3wBnf84f/wCf6nHY7B/D/hR+/wCpp1vkW8ZcgpBI8p29Rhlkh5AeZBnvY49x2CfwRktgThu0ct479fXDE49x2KIZaFHTHjY7HYjkZTUqHqfrhfna7gWZvqce47DSBbjr4UphtWoBrHcTiTKNZHfHmOxkvmzbqfhoozLHxaQmxcz/ALWxXxY/49IctLH7i+Ox2Nl+xzvc84kfIPVf/LHnE/8AMb/s/U47HYFsBbmPlHp/PEsyJSDeVvPOxx2OwIYD8PsTREmd/wBThLRUaiIHP9cdjsaS3ZS3D6g8jf6T+mKOJi8cunLHmOwo/IhApUBbW9MAZqoTQuT/AJsb/uY7HY6enuawLK7k5WkSTOuPa9vTHVGIS1vTHY7A+Pqxv9xjw4eWefXDAY7HY53uRydGOx2OwCP/2Q=="
+        }, {
+            id: 2,
+            name: "noname",
+            price: 100,
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS98_MGWyoCZ_ukQsnAdxRkBLniWM0upXidqg&s"
+        }, {
+            id: 3,
+            name: "noname",
+            price: 200,
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7YgZeb2mowvHMkNd1tcPX2U4aTmZL6cMCUw&s"
+        }, {
+            id: 4,
+            name: "noname",
+            price: 300,
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcTPb9aiQIkysg7M7fVT7axOcvGfjCLqsZvQ&s"
+        }, {
+            id: 5,
+            name: "noname",
+            price: 500,
+            img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScn2RMXJ0aaTRHN1YxlDmf5zRf7216Wb65kui3cOdIi1kFkuoWG0bsX2dxkz7ccZtdmFk&usqp=CAU"
+        }];
+
+        function getUserData(user) {
+            return JSON.parse(localStorage.getItem("wallet_" + user) || '{"balance":0,"history":[]}');
+        }
+
+        function setUserData(user, data) {
+            localStorage.setItem("wallet_" + user, JSON.stringify(data));
+        }
+
+        function formatDate() {
+            return new Date().toLocaleString("th-TH");
+        }
+
+        function toggleMenu() {
+            document.querySelector("nav ul").classList.toggle("show");
+        }
+
+        function showPage(page) {
+            ["loginPage", "registerPage", "shopPage", "walletPage", "historyPage", "addressModal"].forEach(id => document.getElementById(id).classList.add("hidden"));
+            document.getElementById(page).classList.remove("hidden");
+            document.getElementById("mainHeader").classList.toggle("hidden", page == "loginPage" || page == "registerPage");
+        }
+
+        function setActiveMenu(menuId) {
+            ["menuHome", "menuWallet", "menuHistory"].forEach(id => document.getElementById(id).classList.remove("active"));
+            document.getElementById(menuId).classList.add("active");
+        }
+
+        function showShop() {
+            showPage("shopPage");
+            setActiveMenu("menuHome");
+            loadWallet();
+        }
+
+        function showWallet() {
+            showPage("walletPage");
+            setActiveMenu("menuWallet");
+            loadWallet();
+        }
+
+        function showHistory() {
+            showPage("historyPage");
+            setActiveMenu("menuHistory");
+            document.getElementById("history").scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function showLogin() {
+            showPage("loginPage");
+        }
+
+        function showRegister() {
+            showPage("registerPage");
+        }
+
+        // Register
+        function register() {
+            let user = document.getElementById("regUser").value;
+            let pass = document.getElementById("regPass").value;
+            if (!user || !pass) {
+                document.getElementById("regMsg").innerText = "❌ กรอกข้อมูลให้ครบ";
+                return;
+            }
+            if (localStorage.getItem("user_" + user)) {
+                document.getElementById("regMsg").innerText = "❌ ชื่อนี้ถูกใช้แล้ว";
+                return;
+            }
+            localStorage.setItem("user_" + user, pass);
+            localStorage.setItem("wallet_" + user, JSON.stringify({
+                balance: 0,
+                history: []
+            }));
+            document.getElementById("regMsg").innerText = "✅ สมัครสำเร็จ! กรุณาล็อกอิน";
+        }
+
+        // Login
+        function login() {
+            let user = document.getElementById("loginUser").value;
+            let pass = document.getElementById("loginPass").value;
+            // admin
+            if (user === "thanakron" && pass === "zx888999") {
+                localStorage.setItem("currentUser", "admin");
+                showAdminDashboard();
+                return;
+            }
+            let stored = localStorage.getItem("user_" + user);
+            if (stored && stored === pass) {
+                localStorage.setItem("currentUser", user);
+                loadWallet();
+                showShop();
+            } else {
+                document.getElementById("loginMsg").innerText = "❌ ชื่อผู้ใช้หรือรหัสผ่านผิด";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("currentUser");
+            showLogin();
+        }
+
+        // Wallet / Shop functions
+        let pendingProductId = null;
+
+        function loadWallet() {
+            let user = localStorage.getItem("currentUser");
+            if (!user) return;
+            document.getElementById("currentUser").innerText = user;
+            let data = getUserData(user);
+            document.getElementById("balance").innerText = data.balance;
+            renderProducts();
+            renderHistory(data.history);
+
+            // show user/admin view
+            if (user === "admin") {
+                document.getElementById("userAddMoney").classList.add("hidden");
+                document.getElementById("adminConfirmMoney").classList.remove("hidden");
+                loadPendingTransfers();
+            } else {
+                document.getElementById("userAddMoney").classList.remove("hidden");
+                document.getElementById("adminConfirmMoney").classList.add("hidden");
+            }
+        }
+
+        function renderProducts() {
+            let container = document.getElementById("productList");
+            container.innerHTML = products.map(p => `<div class="product"><img src="${p.img}" alt="${p.name}"><div class="product-info"><h4>${p.name}</h4><p>${p.price} บาท</p><button onclick="buy(${p.id})">ซื้อ</button></div></div>`).join("");
+        }
+
+        function buy(id) {
+            let user = localStorage.getItem("currentUser");
+            let data = getUserData(user);
+            if (data.balance <= 0) {
+                alert("❌ ยอดเงินไม่พอ โปรดเติมเงินก่อน");
+                return;
+            }
+            pendingProductId = id;
+            showPage("addressModal");
+        }
+
+        function confirmBuy() {
+            let name = document.getElementById("addressName").value;
+            let line = document.getElementById("addressLine").value;
+            if (!name || !line) {
+                alert("กรอกข้อมูลให้ครบ");
+                return;
+            }
+            let user = localStorage.getItem("currentUser");
+            let data = getUserData(user);
+            let product = products.find(p => p.id === pendingProductId);
+            if (data.balance >= product.price) {
+                data.balance -= product.price;
+                data.history.push({
+                    type: "ซื้อ " + product.name,
+                    amount: product.price,
+                    time: formatDate(),
+                    address: name + " | " + line
+                });
+                setUserData(user, data);
+                document.getElementById("walletMsg").innerText = "✅ ซื้อ " + product.name + " สำเร็จ!";
+            } else {
+                document.getElementById("walletMsg").innerText = "❌ ยอดเงินไม่พอ";
+            }
+            pendingProductId = null;
+            showPage("shopPage");
+            loadWallet();
+        }
+
+        function cancelBuy() {
+            pendingProductId = null;
+            showPage("shopPage");
+        }
+
+        // Add money (user) -> pending
+        function addMoney() {
+            let amount = document.getElementById("amount").value;
+            if (!amount || amount <= 0) {
+                alert("กรอกจำนวนเงินให้ถูกต้อง");
+                return;
+            }
+            let user = localStorage.getItem("currentUser");
+            let data = getUserData(user);
+            data.history.push({
+                type: "เติมเงิน (รออนุมัติ)",
+                amount: parseInt(amount),
+                time: formatDate()
+            });
+            setUserData(user, data);
+            document.getElementById("amount").value = "";
+            document.getElementById("walletMsg2").innerText = "✅ แจ้งโอนเงิน " + amount + " บาทเรียบร้อย";
+            loadWallet();
+        }
+
+        // Pending transfers for admin
+        function loadPendingTransfers() {
+            let allUsers = Object.keys(localStorage).filter(k => k.startsWith("wallet_"));
+            let html = "";
+            allUsers.forEach(u => {
+                let uname = u.replace("wallet_", "");
+                let data = getUserData(uname);
+                data.history.forEach((item, i) => {
+                    if (item.type.includes("รออนุมัติ")) {
+                        html += `<div>${uname} : ${item.amount} บาท เวลา:${item.time} <button onclick="approveMoney('${uname}',${i})">✅ อนุมัติ</button></div>`;
+                    }
+                });
+            });
+            document.getElementById("pendingTransfers").innerHTML = html || "ไม่มีรายการ";
+        }
+
+        function approveMoney(username, index) {
+            let data = getUserData(username);
+            let item = data.history[index];
+            if (item && item.type.includes("รออนุมัติ")) {
+                data.balance += item.amount;
+                item.type = "เติมเงิน (อนุมัติแล้ว)";
+                setUserData(username, data);
+                loadPendingTransfers();
+                loadWallet();
+            }
+        }
+
+        // History
+        function renderHistory(history) {
+            let h = document.getElementById("history");
+            h.innerHTML = history.map(item => `<div class="history-item">${item.type} -${item.amount}฿<div class="time">${item.time}</div>${item.address?'<div>จัดส่ง: '+item.address+'</div>':''}</div>`).join("");
+        }
+
+        function clearHistory() {
+            let user = localStorage.getItem("currentUser");
+            if (!user) return;
+            let data = getUserData(user);
+            data.history = [];
+            setUserData(user, data);
+            renderHistory([]);
+            document.getElementById("walletMsg2").innerText = "✅ ล้างประวัติเรียบร้อย";
+        }
+
+        window.onload = () => {
+            let user = localStorage.getItem("currentUser");
+            if (user) {
+                if (user === "admin") {
+                    showAdminDashboard();
+                } else {
+                    loadWallet();
+                    showShop();
+                }
+            } else showLogin();
+        }
+
+        // Admin dashboard
+        function showAdminDashboard() {
+            showWallet();
+        }
+    </script>
+</body>
+
+</html>
